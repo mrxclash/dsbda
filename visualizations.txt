@@ -1,0 +1,42 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+df = pd.read_csv("heart.csv")
+
+df
+
+df.head()
+
+df.shape
+
+df.isnull().sum()
+
+df.fillna(method="bfill",inplace=True)
+
+df.isnull().sum()
+
+plt.hist(df['age'])
+plt.xlabel('age')
+plt.plot()
+
+sns.histplot(df['chol'])
+
+sns.barplot(y='chol', x="cp", data=df)
+
+sns.lineplot(x="age", y="chol", data=df)
+plt.show()
+
+sns.scatterplot(x="trtbps", y="thalachh", data=df)
+
+sns.boxplot(y='chol', x="cp", data=df)
+
+data = [df.cp[df.cp == "typical"].count(),df.cp[df.cp == "asymptomatic"].count(),
+       df.cp[df.cp == "nonanginal"].count(),df.cp[df.cp == "nontypical"].count()]
+labels = ["nonanginal","typical","nontypical","nonangial"]
+plt.pie(data,labels=labels)
+plt.show()
+
+sns.violinplot(y='chol', x="cp", data=df)
+
