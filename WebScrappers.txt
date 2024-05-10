@@ -1,0 +1,92 @@
+from bs4 import BeautifulSoup as bs
+import requests 
+
+link='https://www.amazon.in/product-reviews/B0CHX1W1XY/ref=cm_cr_arp_d_viewopt_sr?ie=UTF8&filterByStar=all_stars&reviewerType=all_reviews'
+
+page = requests.get(link)
+
+page
+
+page.content
+
+soup = bs(page.content,'html.parser')
+
+print(soup.prettify())
+
+names = soup.find_all('span',class_='a-profile-name')
+
+names
+
+cust_name=[]
+for i in range(0,len(names)):
+    cust_name.append(names[i].get_text())
+cust_name
+
+title = soup.find_all('a',class_='review-title-content')
+
+title
+
+review_title=[]
+for i in range(0,len(title)):
+    review_title.append(title[i].get_text())
+review_title
+
+review_title[:] = [titles.lstrip('\n') for titles in review_title]
+review_title[:] = [titles.rstrip('\n') for titles in review_title]
+
+review_title
+
+rating = soup.find_all('i',class_='review-rating') 
+rating
+
+rate = []  
+for i in range(0,len(rating)):
+    rate.append(rating[i].get_text()) 
+rate 
+
+review=soup.find_all("span",{"data-hook":"review-body"})
+review
+
+review_content = []   
+for i in range(0,len(review)):
+    review_content.append(review[i].get_text()) 
+review_content  
+
+review_content[:] = [reviews.lstrip('\n') for reviews in review_content]
+review_content[:] = [reviews.rstrip('\n') for reviews in review_content]
+
+import pandas as pd
+
+df =pd.DataFrame()
+
+print(len(review_content))
+print(len(rate))
+print(len(review_title))
+print(len(cust_name))
+
+df['Customer Name']=cust_name
+df['Review title']=review_title 
+df['Ratings']=rate
+df['Reviews']=review_content
+
+print(len(review_content))
+print(len(rate))
+print(len(review_title))
+print(len(cust_name))
+
+df.to_csv('reviews.csv',index=True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
