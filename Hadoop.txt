@@ -1,0 +1,145 @@
+PartA: Assignment No2
+Aim: Design a distributed application using MapReduce which processes log file of asystem.List out
+users who have logged for maximum period on the system.
+Name of input file is access_log_short.csv
+
+PARTA
+1. Open Eclipse> File > New > Java Project >( Name it – MRProgramsDemo) > Next>Click on
+Libraries Tab>Click on Add External JARS tab
+jar FILE LOCATION
+/usr/lib/Hadoop ->select all jar files
+/usr/lib/Hadoop/client ->select all jar files
+2. Right Click > New > Package ( Name it - mrLogFile_demo > Finish.
+3. Right Click on mrLogFile_demo Package > New > Class (Name it – UserLogDriver).
+
+# Add following code in that class
+
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.*;
+import org.apache.hadoop.mapred.*;
+public class UserLogDriver {
+public static void main(String[] args) {
+JobClient my_client = new JobClient();
+// Create a configuration object for the job
+JobConf job_conf = new JobConf(UserLogDriver.class);
+// Set a name of the Job
+job_conf.setJobName("MaxLoggedUsers");
+// Specify data type of output key and value
+job_conf.setOutputKeyClass(Text.class);
+job_conf.setOutputValueClass(IntWritable.class);
+// Specify names of Mapper and Reducer Class
+job_conf.setMapperClass(UserLogMapper.class);
+job_conf.setReducerClass(UserLogReducer .class);
+// Specify formats of the data type of Input and output
+job_conf.setInputFormat(TextInputFormat.class);
+job_conf.setOutputFormat(TextOutputFormat.class);
+// Set input and output directories using command line arguments,
+//arg[0] = name of input directory on HDFS, and arg[1] = name of
+output directory to be created to store the output file.
+FileInputFormat.setInputPaths(job_conf, new Path(args[0]));
+FileOutputFormat.setOutputPath(job_conf, new Path(args[1]));
+my_client.setConf(job_conf);
+try {
+// Run the job
+JobClient.runJob(job_conf);
+} catch (Exception e) {
+e.printStackTrace();
+}
+}
+}
+
+# Save the file
+
+4. Right Click on mrLogFile_demo Package > New > Class (Name it –
+UserLogReducer).
+
+import java.io.IOException;
+import java.util.*;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapred.*;
+public class UserLogReducer extends MapReduceBase implements Reducer<Text,
+IntWritable, Text, IntWritable> {
+public void reduce(Text t_key, Iterator<IntWritable> values,
+OutputCollector<Text,IntWritable> output, Reporter reporter) throws IOException
+{
+Text key = t_key;
+int frequencyForUser = 0;
+while (values.hasNext()) {
+// replace type of value with the actual type of our value
+IntWritable value = (IntWritable) values.next();
+frequencyForUser += value.get();
+}
+output.collect(key, new IntWritable(frequencyForUser));
+}
+}
+
+# Save the file
+
+5. Right Click on mrLogFile_demo Package > New > Class (Name it –
+UserLogMapper).
+
+# Add following code in that class
+package MRLogFile;
+import java.io.IOException;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapred.*;
+public class UserLogMapper extends MapReduceBase implements Mapper<LongWritable,
+Text, Text, IntWritable> {
+private final static IntWritable one = new IntWritable(1);
+public void map(LongWritable key, Text value, OutputCollector<Text,
+IntWritable> output, Reporter reporter) throws IOException {
+String valueString = value.toString();
+String[] SingleUserData = valueString.split("-");
+output.collect(new Text(SingleUserData[0]), one);
+}
+}
+
+# Save the file
+
+PART B
+Create .jar file for your program execution :
+Make a jar file
+In eclipse Right click on MRLogFile Project > then select Export> Click on Java>JAR
+Files>Click on Next>then select export destination for JAR file as
+
+/home/Cloudera/MRlogFile.jar>Finish
+*MRLogFile.jar file will get created in your /home/Cloudera/ folder
+
+
+
+PART C:
+# Open terminal
+
+#Check for present working Directory
+
+[cloudera@quickstart ~]$ pwd
+/home/cloudera
+
+#Create inputfoder with name MRinputfolder1
+
+[cloudera@quickstart ~]$ hdfs dfs -mkdir /MRinputfolder1
+
+[cloudera@quickstart ~]$ hdfs dfs -ls /
+
+[cloudera@quickstart ~]$ hdfs dfs -put
+/home/cloudera/access_log_short.txt /MRInputfolder1
+
+[cloudera@quickstart ~]$ hdfs dfs -cat
+/MRInputfolder1/access_log_short.txt
+
+[cloudera@quickstart ~]$ hadoop jar /home/cloudera/MRLogFile.jar
+mrLogFile_demo.UserLogDriver /MRInputfolder1/access_log_short.txt
+/MRoutputfolder1
+
+
+[cloudera@quickstart ~]$ hdfs dfs -ls /MRoutputfolder1
+
+
+[cloudera@quickstart ~]$ hdfs dfs -cat /MRoutputfolder1/part-00000
+
+
+
+

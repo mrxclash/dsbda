@@ -1,0 +1,78 @@
+create database my;
+
+use my;
+
+create table flight(fno int, year int, dest varchar(10),delay float);
+
+alter table flight rename to f2;
+
+alter table f2 and columns(source varchar(10));
+
+drop table flight;
+
+desc f2;
+
+create table flight(fno int, year int, dest varchar(10),delay float)
+row format delimited
+fields terminated by ','
+lines terminated by '\n'
+stored as textfile;
+
+insert into flight values(121,2003,"mumbar",50.6);
+insert into flight values(122,2004,"mumbar",30.6);
+
+select * from flight;
+
+gedit fil.txt
+
+pwd
+
+ls
+
+load data local inpath 'fil.txt'
+overwrite into table flight;
+
+select * from flight;
+
+create table nflight(fno int,year int,source varchar(10))
+row format delimited
+fields terminated by ','
+lines terminated by '\n'
+stored as textfile;
+
+select * from flight ;
+
+insert into nflight values(234,2009,"pune");
+
+select a.fno, a.year, a.dest ,a.delay ,b.source
+from flight a join nflight b
+on(a.fno=b.fno);
+
+select * from flight;
+
+create index flight_index on table flight(fno)
+as'org.apache.hadoop.hive.ql.index.compact.CompactIndexHandler'
+WITH DEFERRED REBUILD;
+
+SHOW TABLES;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
